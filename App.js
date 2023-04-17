@@ -1,118 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen ';
+import GoalScreen from './screens/GoalScreen';
 
-const STORAGE_KEY = '@todos';
+const Stack = createNativeStackNavigator();
 
-
-const TodoList = () => {
-  const [textInput, setTextInput] = useState('');
-  const [todos, setTodos] = useState([]);
-  const [mainCounter, setMainCounter] = useState(0)
-  const [modalVisible, setModalVisible] = useState(false);
-
-  useEffect(() => {
-    loadTodos();
-  }, []);
-
-  const addTodo = () => {
-    setTodos([...todos, textInput]);
-    setTextInput('');
-  };
-
-  const deleteTodo = (index) => {
-    const newTodos = [...todos];
-    newTodos.splice(index, 1);
-    setTodos(newTodos);
-    setMainCounter(mainCounter + 1)
-  };
-
-  const saveTodos = async () => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const loadTodos = async () => {
-    try {
-      const todosFromStorage = await AsyncStorage.getItem(STORAGE_KEY);
-      if (todosFromStorage !== null) {
-        setTodos(JSON.parse(todosFromStorage));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    saveTodos();
-  }, [todos]);
-
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.textTack}>all tasks completed: {mainCounter}</Text>
-     
-    
-      {todos.map((todo, index) => (
-        <TouchableOpacity key={index} onPress={() => deleteTodo(index)}>
-          <Text style={styles.todo}>{todo}</Text>
-        </TouchableOpacity>
-      ))}
-       
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>This is a Modal</Text>
-            <TouchableOpacity style={styles.button} onPress={addTodo}>
-              <Text>add task</Text>
-            </TouchableOpacity>
-            <TextInput
-              style={styles.input}
-              placeholder="Add a todo"
-              value={textInput}
-              onChangeText={(text) => setTextInput(text)}
-            />
-           
-          </View>
-       
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{title: 'Welcome'}}
+        />
+        <Stack.Screen name="Goal" component={GoalScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
- 
-  input: {
-    width: '80%',
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 20,
-  },
-  todo: {
-    fontSize: 20,
-    marginBottom: 10,
-    borderColor: '#537075',
-    padding: 2,
-    borderWidth: 2,
-    backgroundColor: '#728f9f',
-    width: 200
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#DDDDDD',
-    padding: 10,
-    margin: 10
-  },
-  textTack: {
-    marginBottom: 20
-  },
-});
-
-export default TodoList;
+export default App;
