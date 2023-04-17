@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Modal  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = '@todos';
@@ -9,6 +9,7 @@ const TodoList = () => {
   const [textInput, setTextInput] = useState('');
   const [todos, setTodos] = useState([]);
   const [mainCounter, setMainCounter] = useState(0)
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     loadTodos();
@@ -52,20 +53,33 @@ const TodoList = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.textTack}>all tasks completed: {mainCounter}</Text>
-      <TouchableOpacity style={styles.button} onPress={addTodo}>
-        <Text>add task</Text>
+     
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Text style={styles.modalButton}>Open Modal</Text>
       </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Add a todo"
-        value={textInput}
-        onChangeText={(text) => setTextInput(text)}
-      />
+    
       {todos.map((todo, index) => (
         <TouchableOpacity key={index} onPress={() => deleteTodo(index)}>
           <Text style={styles.todo}>{todo}</Text>
         </TouchableOpacity>
       ))}
+        <Modal visible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>This is a Modal</Text>
+          <TouchableOpacity style={styles.button} onPress={addTodo}>
+            <Text>add task</Text>
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Add a todo"
+            value={textInput}
+            onChangeText={(text) => setTextInput(text)}
+          />
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalButton}>Close Modal</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
